@@ -1,0 +1,26 @@
+name: MessageService
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  login:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout repostory
+        uses: actions/checkout@v4
+
+      - name: Azure Login using OIDC authentication
+        uses: azure/login@v1
+        with:
+          tenant-id: ${{ secrets.OP_TENANT_ID }}
+          subscription-id: ${{ secrets.OPLAB_SUBSCRIPTION_ID }}
+          client-id: ${{ secrets.ZEROTRUSTAPP_DEV_CLIENT_ID }}
