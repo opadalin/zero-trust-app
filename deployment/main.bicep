@@ -96,3 +96,16 @@ resource group_read_role_assignment_to_cosmos_db 'Microsoft.Authorization/roleAs
     roleDefinitionId: cosmosDbAccountReaderRole
   }
 }
+
+var cosmosDbBuiltInDataReaderRole = '/${subscription().id}/resourceGroups/${resourceGroup().name}/providers/Microsoft.DocumentDB/databaseAccounts/${database_account.name}/sqlRoleDefinitions/00000000-0000-0000-0000-000000000001'
+
+@description('''Assign 'Cosmos DB Built-in Data Reader' role for user group.''')
+resource group_reader_role_assignment_to_cosmos_db 'Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignments@2024-05-15' = {
+  name: guid(cosmosDbBuiltInDataReaderRole, groupId, database_account.id)
+  parent: database_account
+  properties: {
+    principalId: groupId
+    scope: database_account.id
+    roleDefinitionId: cosmosDbBuiltInDataReaderRole
+  }
+}
