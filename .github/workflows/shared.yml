@@ -1,4 +1,4 @@
-name: MessageService
+name: Shared
 
 on:
   workflow_dispatch:
@@ -7,7 +7,7 @@ on:
       - main
 
 jobs:
-  login:
+  deploy:
     runs-on: ubuntu-latest
 
     permissions:
@@ -24,3 +24,11 @@ jobs:
           tenant-id: ${{ secrets.OP_TENANT_ID }}
           subscription-id: ${{ secrets.OPLAB_SUBSCRIPTION_ID }}
           client-id: ${{ secrets.ZEROTRUSTAPP_DEV_CLIENT_ID }}
+
+      - name: Deploy Azure resources
+        uses: azure/arm-deploy@v2
+        with:
+          template: ./deployment/main.bicep
+          resourceGroupName: ${{ vars.RG_ZEROTRUSTAPP_DEV }}
+          parameters: ./deployment/main.bicepparam
+          scope: resourcegroup
