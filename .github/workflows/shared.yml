@@ -6,7 +6,57 @@ on:
     branches:
       - main
 
+env:
+  SOLUTION_PATH: ./services/MessageService/MessageService.sln
+  ARTIFACT_NAME: shared
+
 jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8.0
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: dotnet restore
+        run: dotnet restore ${{ env.SOLUTION_PATH }}   
+
+      - name: dotnet build
+        run: dotnet build ${{ env.SOLUTION_PATH }}
+        
+      - name: dotnet publish
+        run: |
+          dotnet publish ${{ env.SOLUTION_PATH }} \
+          --configuration Release \
+          --framework net8.0 \
+          --runtime linux-x64 \
+          --self-contained true \
+          --property:PublishDire=${{ github.workspace }}/publish
+        shell: bash
+
+      - name: Zip artifact
+        run: |
+          mkdir -p ${{ github.workspace }}/zips
+          cd ${{ github.workspace }}/publish
+          zip -rX ${{ github.workspace }}/zips/${{ env.ARTIFACT_NAME }}.zip .
+        shell: bash
+        
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ github.workspace }}/zips/${{ env.ARTIFACT_NAME }}.zip
+          if-no-files-found: error
+          retention-days: 7
+      
   deploy:
     runs-on: ubuntu-latest
 
@@ -27,8 +77,37 @@ jobs:
 
       - name: Deploy Azure resources
         uses: azure/arm-deploy@v2
+        id: deploy
         with:
           template: ./deployment/main.bicep
           resourceGroupName: ${{ vars.RG_ZEROTRUSTAPP_DEV }}
           parameters: ./deployment/main.bicepparam
           scope: resourcegroup
+
+      - name: Download built artifact
+        id: download
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ./downloads
+
+      - name: Upload zipped artifact to blob storage
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            az storage blob upload \
+            --account-name ${{ steps.deploy.outputs.storageAccountName }} \
+            --container-name ${{ steps.deploy.outputs.storageContainerName }} \
+            --name ${{ env.ARTIFACT_NAME }}
+            --file ${{ steps.download.outputs.download-path }}/${{ env.ARTIFACT_NAME }}.zip \
+            --auth-mode login \
+            --overwrite true
+
+      - name: Trigger syncing for function app
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            az rest -m post \
+            --header "Accept=application/json" \
+            -u 'https://management.azure.com/subscriptions/${{ secrets.OPLAB_SUBSCRIPTION_ID }}/resourceGroups/${{ vars.RG_ZEROTRUSTAPP_DEV }}/providers/Microsoft.Web/sites/${{ steps.deploy.outputs.functionAppName }}/syncfunctiontriggers?api-version=2022-03-01'
+ 
