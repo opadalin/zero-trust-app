@@ -334,7 +334,7 @@ resource pipeline_role_assignment_to_storage_account 'Microsoft.Authorization/ro
   properties: {
     principalId: githubWorkflowAzurePrincipalId
     principalType: 'ServicePrincipal'
-    roleDefinitionId: githubWorkflowAzurePrincipalId
+    roleDefinitionId: storageBlobDataContributor
   }
 }
 
