@@ -92,6 +92,13 @@ jobs:
           name: ${{ env.ARTIFACT_NAME }}
           path: ./downloads
 
+      - name: Azure Login using OIDC authentication
+        uses: azure/login@v1
+        with:
+          tenant-id: ${{ secrets.OP_TENANT_ID }}
+          subscription-id: ${{ secrets.OPLAB_SUBSCRIPTION_ID }}
+          client-id: ${{ secrets.ZEROTRUSTAPP_DEV_CLIENT_ID }}
+          
       - name: Upload zipped artifact to blob storage
         uses: azure/CLI@v1
         with:

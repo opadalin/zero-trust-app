@@ -322,6 +322,7 @@ resource function_app_contributor_sql_role_assignment_to_cosmos 'Microsoft.Docum
 param githubWorkflowAzurePrincipalId string
 
 param storageBlobDataContributor string = getRoleDefinitions()['Storage Blob Data Contributor']
+param storageBlobDataOwner string = getRoleDefinitions()['Storage Blob Data Owner']
 
 @description('''
 Storage Blob Data Contributor role for pipeline to storage account.
@@ -329,12 +330,12 @@ This enables the pipeline to upload built artifact (the function app as a zipped
 to the function app storage account.
 ''')
 resource pipeline_role_assignment_to_storage_account 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(storage_account.id, githubWorkflowAzurePrincipalId, storageBlobDataContributor)
+  name: guid(storage_account.id, githubWorkflowAzurePrincipalId, storageBlobDataOwner)
   scope: storage_account
   properties: {
     principalId: githubWorkflowAzurePrincipalId
     principalType: 'ServicePrincipal'
-    roleDefinitionId: storageBlobDataContributor
+    roleDefinitionId: storageBlobDataOwner
   }
 }
 
