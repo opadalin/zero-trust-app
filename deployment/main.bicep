@@ -239,7 +239,7 @@ resource function_app 'Microsoft.Web/sites@2023-12-01' = {
         }
         {
           name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
-          value: ''
+          value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccountName};EndpointSuffix=${environment().suffixes.storage};AccountKey=${storage_account.listKeys().keys[0].value}'
         }
       ]
     }
