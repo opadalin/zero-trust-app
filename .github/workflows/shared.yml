@@ -98,7 +98,7 @@ jobs:
           tenant-id: ${{ secrets.OP_TENANT_ID }}
           subscription-id: ${{ secrets.OPLAB_SUBSCRIPTION_ID }}
           client-id: ${{ secrets.ZEROTRUSTAPP_DEV_CLIENT_ID }}
-          
+
       - name: Upload zipped artifact to blob storage
         uses: azure/CLI@v1
         with:
@@ -106,7 +106,7 @@ jobs:
             az storage blob upload \
             --account-name ${{ steps.deploy.outputs.storageAccountName }} \
             --container-name ${{ steps.deploy.outputs.storageContainerName }} \
-            --name ${{ env.ARTIFACT_NAME }}
+            --name ${{ env.ARTIFACT_NAME }} \
             --file ${{ steps.download.outputs.download-path }}/${{ env.ARTIFACT_NAME }}.zip \
             --auth-mode login \
             --overwrite true
