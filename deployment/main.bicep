@@ -237,6 +237,10 @@ resource function_app 'Microsoft.Web/sites@2023-12-01' = {
           name: 'WEBSITE_CONTENTSHARE'
           value: functionAppName
         }
+        {
+          name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
+          value: ''
+        }
       ]
     }
   }
