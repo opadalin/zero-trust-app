@@ -215,11 +215,11 @@ resource function_app 'Microsoft.Web/sites@2023-12-01' = {
         }
         {
           name: 'CosmosDatabaseId'
-          value: nosql_database.id
+          value: nosql_database.properties.resource.id
         }
         {
           name: 'CosmosContainerId'
-          value: database_containers[0].id
+          value: database_containers[0].properties.resource.id
         }
         {
           name: 'WEBSITE_USE_PLACEHOLDER_DOTNETISOLATED'
