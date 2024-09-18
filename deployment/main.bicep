@@ -94,7 +94,7 @@ Storage account name restrictions:
 ''')
 @minLength(3)
 @maxLength(24)
-param storageAccountName string = toLower(replace('safn-${substring(serviceName, 0, 10)}${uniqueId}${env}', '-', ''))
+param storageAccountName string = toLower(replace('safn-${substring(serviceName, 0, 6)}${uniqueId}${env}', '-', ''))
 
 @description('The storage account for the function app.')
 resource storage_account 'Microsoft.Storage/storageAccounts@2023-05-01' = {
