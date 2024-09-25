@@ -84,6 +84,7 @@ jobs:
           resourceGroupName: ${{ vars.RG_ZEROTRUSTAPP_DEV }}
           parameters: ./deployment/main.bicepparam
           scope: resourcegroup
+          failOnStdErr: false
 
       - name: Download built artifact
         id: download
